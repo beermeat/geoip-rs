@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+    geoip-rs:
+        image: beermeat/geoip-rs:1.0.0
+        container_name: ${APP_CONTAINER_NAMESPACE:-}geoip-rs
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        ports:
+            - 127.0.0.1:${APP_GEOIP_PORT:-8080}:8080
