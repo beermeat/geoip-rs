@@ -98,10 +98,17 @@ or you can copy `.env.template` to `.env` and customize its contents
 
 ### Running in docker
 
+Build your own image:
+
     ln -s docker/docker-compose.dev.yml docker-compose.yml
     cp docker/.env.dist .env
     docker compose up -d
     curl http://127.0.0.1:8080/?ip=46.51.179.90
+
+Or just use the existing:
+
+    docker run -p 8080:8080 beermeat/geoip-rs:latest
+
 
 ### License
 

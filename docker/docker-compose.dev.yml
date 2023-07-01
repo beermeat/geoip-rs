@@ -1,7 +1,6 @@
 version: "3.4"
 services:
     geoip-rs:
-        image: beermeat/geoip-rs:1.0.1
         container_name: ${APP_CONTAINER_NAMESPACE:-}geoip-rs
         build:
             context: .
