@@ -98,6 +98,9 @@ or you can copy `.env.template` to `.env` and customize its contents
 
 ### Running in docker
 
+Many thanks to P3TERX/GeoLite.mmdb for distributing the database.
+Check releases [here](https://github.com/P3TERX/GeoLite.mmdb/releases) and set the last value in the GEOLIGHT_RELEASE environment variable when building the image.
+
 Build your own image:
 
     ln -s docker/docker-compose.dev.yml docker-compose.yml

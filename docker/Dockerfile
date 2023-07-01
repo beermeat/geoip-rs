@@ -1,20 +1,33 @@
-FROM rust:alpine3.18
+FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
+WORKDIR /app
 
-RUN apk add musl-dev
+FROM chef AS planner
+COPY src src
+COPY Cargo.* .
+RUN cargo chef prepare --recipe-path recipe.json
 
-WORKDIR /opt/rust
+FROM chef AS builder
 
-# Download recent geoip data
-RUN wget https://git.io/GeoLite2-City.mmdb
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
+COPY src src
+COPY Cargo.* .
+RUN cargo build --release --bin geoip-rs
+RUN strip /app/target/release/geoip-rs
 
-RUN mkdir build
-COPY src build/src
-COPY Cargo.* build/
-RUN cd build && cargo build --release && mv target/release/geoip-rs /opt/rust/geoip-rs && cd /opt/rust/ && rm -rf build
+# Download the latest GeoLite2-City.mmdb
+ARG GEOLIGHT_RELEASE=latest
+RUN wget -O GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb?release=${GEOLIGHT_RELEASE}
 
-ENV GEOIP_RS_DB_PATH=/opt/rust/GeoLite2-City.mmdb
+FROM debian:buster-slim AS runtime
+COPY --from=builder /app/target/release/geoip-rs /usr/local/bin
+COPY --from=builder /app/GeoLite2-City.mmdb /opt/GeoLite2-City.mmdb
+
+ENV GEOIP_RS_DB_PATH=/opt/GeoLite2-City.mmdb
 ENV GEOIP_RS_HOST=0.0.0.0
 ENV GEOIP_RS_PORT=8080
 
 EXPOSE 8080
-ENTRYPOINT ["/opt/rust/geoip-rs"]
+ENTRYPOINT ["/usr/local/bin/geoip-rs"]
