@@ -1,4 +1,4 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-1-alpine3.18 AS chef
 WORKDIR /app
 
 FROM chef AS planner
@@ -24,6 +24,9 @@ RUN wget -O GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb?release=${GEOLI
 FROM debian:buster-slim AS runtime
 COPY --from=builder /app/target/release/geoip-rs /usr/local/bin
 COPY --from=builder /app/GeoLite2-City.mmdb /opt/GeoLite2-City.mmdb
+
+ARG GEOLIGHT_RELEASE=latest
+RUN echo ${GEOLIGHT_RELEASE} > /opt/geo_version
 
 ENV GEOIP_RS_DB_PATH=/opt/GeoLite2-City.mmdb
 ENV GEOIP_RS_HOST=0.0.0.0

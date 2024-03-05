@@ -101,12 +101,20 @@ or you can copy `.env.template` to `.env` and customize its contents
 Many thanks to P3TERX/GeoLite.mmdb for distributing the database.
 Check releases [here](https://github.com/P3TERX/GeoLite.mmdb/releases) and set the last value in the GEOLIGHT_RELEASE environment variable when building the image.
 
-Build your own image:
+Up your own image:
 
     ln -s docker/docker-compose.dev.yml docker-compose.yml
     cp docker/.env.dist .env
     docker compose up -d
     curl http://127.0.0.1:8080/?ip=46.51.179.90
+
+Push your own image to hub.docker.com:
+
+    docker compose build geoip-rs
+    docker tag geoip-rs-geoip-rs:latest {REPO}/geoip-rs:{VERSION}
+    docker tag geoip-rs-geoip-rs:latest {REPO}/geoip-rs:latest
+    docker push {REPO}/geoip-rs:{VERSION}
+    docker push {REPO}/geoip-rs:latest
 
 Or just use the existing:
 
